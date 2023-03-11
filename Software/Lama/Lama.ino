@@ -3,9 +3,6 @@
 #include <Audio.h>
 #include <SD.h>
 #include <FS.h>
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
  
@@ -23,15 +20,6 @@
 #define TAIL_MOTOR    23
 
 #define MUSIC_BTN     15 // Next music button
-
-#define FILE_SERVICE_UUID   "85dff000-c85b-44d9-9417-3d8917a8f0f0"
-#define FILE_ACTION_UUID    "85dff001-c85b-44d9-9417-3d8917a8f0f0"
-#define FILE_INFO_UUID      "85dff002-c85b-44d9-9417-3d8917a8f0f0"
-#define FILE_CONTENT_UUID   "85dff003-c85b-44d9-9417-3d8917a8f0f0"
-
-#define REMOTE_SERVICE_UUID "92844c00-d860-46d8-8c82-ac450962df16"
-#define REMOTE_ACTION_UUID  "92844c01-d860-46d8-8c82-ac450962df16"
-#define REMOTE_RESULT_UUID  "92844c02-d860-46d8-8c82-ac450962df16"
 
 #define UPDATE_FILE_PATH "/system/update.bin"
 
@@ -65,17 +53,6 @@ volatile unsigned long milliseconds = 0;
 volatile unsigned long lastTime = 0;
 hw_timer_t *timeTracker = NULL;
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-
-boolean uploading = false;
-
-BLECharacteristic *pFileActionCharacteristic;
-BLECharacteristic *pFileInfoCharacteristic;
-BLECharacteristic *pFileContentCharacteristic;
-
-BLECharacteristic *pRemoteActionCharacteristic;
-BLECharacteristic *pRemoteResultCharacteristic;
-
-File uploadedFile;
 
 void playNext() {
   playing = true;
@@ -113,6 +90,7 @@ void setup() {
   if (DEBUG) Serial.begin(115200);
 
   WiFi.mode(WIFI_MODE_NULL);
+  btStop();
 
   setupSD();
   performUpdate(SD);
@@ -120,7 +98,6 @@ void setup() {
 
   setupMotors();
   pinMode(MUSIC_BTN, INPUT_PULLUP);
-  setupBluetooth();
 
   timeTracker = timerBegin(0, 80, true);
   timerAttachInterrupt(timeTracker, &onTime, true);
