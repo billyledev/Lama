@@ -46,7 +46,6 @@ DanceData *danceData;
 int danceDataLength = 0;
 int danceStep = 0;
 boolean playing = false;
-boolean playNextMusic = false;
 uint32_t lastAudioTime = -1;
 
 volatile unsigned long milliseconds = 0;
@@ -64,18 +63,6 @@ void playNext() {
     Serial.println("...");
   }
   audio.connecttoFS(SD, files[currentMusic].c_str());
-}
-
-void play(String music) {
-  playing = true;
-  lastTime = milliseconds;
-  danceData = loadDanceData(SD);
-  if (DEBUG) {
-    Serial.print("Playing ");
-    Serial.print(music.c_str());
-    Serial.println("...");
-  }
-  audio.connecttoFS(SD, music.c_str());
 }
 
 void IRAM_ATTR onTime() {
@@ -127,8 +114,7 @@ void loop() {
         lastAudioTime = currentAudioTime;
       }
     }
-  } else if (digitalRead(MUSIC_BTN) == LOW || playNextMusic) {
-    playNextMusic = false;
+  } else if (digitalRead(MUSIC_BTN) == LOW) {
     playNext();
   }
 }
