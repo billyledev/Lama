@@ -3,6 +3,7 @@
 #include <Audio.h>
 #include <SD.h>
 #include <FS.h>
+#include <esp_sleep.h>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
  
@@ -40,7 +41,7 @@ const int pwmChannel1 = 0;
 const int pwmChannel2 = 1;
 const int resolution = 8;
 
-int currentMusic = 0;
+RTC_DATA_ATTR int currentMusic = 0;
 int filesNb;
 DanceData *danceData;
 int danceDataLength = 0;
@@ -85,6 +86,7 @@ void setup() {
 
   setupMotors();
   pinMode(MUSIC_BTN, INPUT_PULLUP);
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, 0);
 
   timeTracker = timerBegin(0, 80, true);
   timerAttachInterrupt(timeTracker, &onTime, true);

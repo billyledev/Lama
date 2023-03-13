@@ -13,4 +13,8 @@ void audio_eof_mp3(const char *info) {
   if (currentMusic >= filesNb) {
     currentMusic = 0;
   }
+
+  if (DEBUG) Serial.println("Going into deep sleep");
+  sleep(1);
+  esp_deep_sleep_start();
 }
