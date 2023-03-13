@@ -92,7 +92,7 @@ DanceData *loadDanceData(fs::FS &fs) {
 
   DanceData *data = NULL;
   int currentLine = 0;
-  File dataFile = fs.open(baseName);
+  File dataFile = fs.open(String("/") + baseName);
   if (dataFile) {
     size_t fileSize = dataFile.size();
     if (fileSize == 0) return data;
@@ -119,6 +119,8 @@ DanceData *loadDanceData(fs::FS &fs) {
       }
       loadDataChunk(lineBuffer, data, &currentLine);
     }
+  } else {
+    if (DEBUG) Serial.println("Could not open dance data file!");
   }
 
   return data;
