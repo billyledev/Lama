@@ -80,13 +80,20 @@ void setup() {
   WiFi.mode(WIFI_MODE_NULL);
   btStop();
 
+  pinMode(MUSIC_BTN, INPUT_PULLUP);
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, 0);
+
+  if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_EXT0) {
+    if (DEBUG) Serial.println("Going into deep sleep");
+    sleep(1);
+    esp_deep_sleep_start();
+  }
+
   setupSD();
   performUpdate(SD);
   setupAudio();
 
   setupMotors();
-  pinMode(MUSIC_BTN, INPUT_PULLUP);
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_15, 0);
 
   timeTracker = timerBegin(0, 80, true);
   timerAttachInterrupt(timeTracker, &onTime, true);
